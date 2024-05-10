@@ -1,5 +1,5 @@
 // 验证
-import { IsString, IsEmail } from 'class-validator';
+import { IsString, IsEmail, IsMobilePhone } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -8,9 +8,9 @@ export class CreateUserDto {
   account: string;
   @IsString()
   password: string;
-  @IsString()
+  @IsMobilePhone()
   mobile: string;
-  @IsEmail()
+  @IsEmail({}, { message: '你传的这个邮箱倒是个锤子邮箱' })
   email: string;
   status: number;
 }

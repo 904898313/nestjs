@@ -3,21 +3,27 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
 
-// test
-// import { user, Prisma } from '@prisma/client';
-
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) { }
 
-  async create(createUserDto: any) {
+  async create(createUserDto: CreateUserDto) {
     return await this.prisma.user.create({
       data: createUserDto,
     });
   }
 
   async findAll() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      select: {
+        userName: true,
+        account: true,
+        mobile: true,
+        email: true,
+        status: true,
+        password: false,
+      },
+    });
   }
 
   async findOne(id: number) {
@@ -25,14 +31,31 @@ export class UserService {
       where: {
         id: id,
       },
+      select: {
+        userName: true,
+        account: true,
+        mobile: true,
+        email: true,
+        status: true,
+        password: false,
+      },
     });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.prisma.user.updateMany({
+      where: {
+        id: id,
+      },
+      data: updateUserDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    return await this.prisma.user.deleteMany({
+      where: {
+        id: id,
+      },
+    });
   }
 }
