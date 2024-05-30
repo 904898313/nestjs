@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+// 自定义装饰器
+import { Test } from 'src/common/decorator';
 
 @Controller('user')
 export class UserController {
@@ -13,17 +15,19 @@ export class UserController {
   }
 
   @Get()
-  findAll() {
+  findAll(@Test('8520') test) {
+    console.log(test, 'test');
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string, @Test('8520') test: any) {
     return this.userService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    console.log(updateUserDto, "updateUserDto");
     return this.userService.update(+id, updateUserDto);
   }
 
