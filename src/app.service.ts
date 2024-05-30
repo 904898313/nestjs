@@ -12,11 +12,13 @@ export class AppService {
     // return '成功';
   }
 
+  // 生成token
   async createToken(payload: any): Promise<string> {
     const token = this.jwtService.sign(payload);
     return token;
   }
 
+  // 验证token
   async validateToken(token: string): Promise<any> {
     try {
       return this.jwtService.verify(token);

@@ -1,14 +1,4 @@
-
-
-/*
- * @Author: yangchenguang
- * @Description: 
- * @Date: 2024-04-23 16:09:57
- * @LastEditors: yangchenguang
- * @LastEditTime: 2024-05-30 12:07:16
- */
-
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma.service';
@@ -20,6 +10,15 @@ export class UserService {
   constructor(private prisma: PrismaService) { }
 
   async create(createUserDto: CreateUserDto) {
+    // 先查询数据库，看看是否已经存在相同用户名的用户记录
+    const existingUser = await this.prisma.user.findMany({
+      where: {
+        account: createUserDto.account,
+      },
+    });
+    if (existingUser.length) {
+      throw new HttpException('账户已经存在', HttpStatus.FORBIDDEN);
+    }
     createUserDto.password = bcrypt.hashSync(createUserDto.password, 10);
     const res = await this.prisma.user.create({
       data: createUserDto,
@@ -81,12 +80,27 @@ export class UserService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.prisma.user.updateMany({
+    // 先查询数据库，
+    const existingUser = await this.prisma.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!existingUser) {
+      throw new HttpException('账户不存在', HttpStatus.FORBIDDEN);
+    }
+    const res = await this.prisma.user.updateMany({
       where: {
         id: id,
       },
       data: updateUserDto,
     });
+
+    const response = {
+      message: '更新成功',
+      statusCode: 200,
+    };
+    return response;
   }
 
   async remove(id: number) {

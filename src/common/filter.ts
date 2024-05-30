@@ -12,8 +12,15 @@ export class ErrorFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
-    const status = exception.getStatus();
-    const res = exception.getResponse();
+
+    let status, res;
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      res = exception.getResponse();
+    } else {
+      status = 500;
+      res = '未知错误';
+    }
 
     response.status(status).json({
       statusCode: status,

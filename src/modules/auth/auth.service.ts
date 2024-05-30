@@ -46,7 +46,6 @@ export class AuthService {
     // 生成token
     const token = this.createToken({
       id: userInfo.id,
-      userName: userInfo.userName,
       account: userInfo.account,
     });
     return {
