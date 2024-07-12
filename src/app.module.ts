@@ -1,5 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { AppController } from './app.controller';
+import { FilesController } from './file.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -16,7 +17,7 @@ import { verifyTokenMiddleware, logMiddleware } from './common/middleware';
       signOptions: { expiresIn: '1h' }, // 设置 token 过期时间
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, FilesController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {

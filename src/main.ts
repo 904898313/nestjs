@@ -3,6 +3,9 @@ import { AppModule } from './app.module';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ErrorFilter } from './common/filter';
+import { RolesGuard } from './common/guard';
+import { loggerInterceptor } from './common/Interceptor';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -13,8 +16,14 @@ async function bootstrap() {
     // methods: ['POST'],
   });
 
-  // 注册全局异常过滤器
-  app.useGlobalFilters(new ErrorFilter());
+  // 执行顺序
+  // 1.收到请求 2.中间件 3.守卫 4.拦截器 5.管道 6.控制器controller 7.服务service 8.异常过滤器 9.服务器响应
+
+  // 注册全局守卫
+  app.useGlobalGuards(new RolesGuard());
+
+  // 注册全局拦截器
+  app.useGlobalInterceptors(new loggerInterceptor());
 
   // 注册全局管道
   app.useGlobalPipes(
@@ -33,6 +42,22 @@ async function bootstrap() {
       // dismissDefaultMessages: true, // 验证将不会使用默认消息。如果未明确设置，错误消息始终为 undefined。
     }),
   );
+
+  // 注册全局异常过滤器
+  app.useGlobalFilters(new ErrorFilter());
+
+  // swagger
+  const options = new DocumentBuilder()
+    .setTitle('Your API')
+    .setDescription('API description')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: {
+      // 配置...
+    },
+  });
 
   // 配置静态资源目录 @nestjs/platform-express
   app.useStaticAssets('public', {

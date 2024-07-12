@@ -1,11 +1,18 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 @Controller()
+@ApiTags('主模块接口')
 export class AppController {
   constructor(private readonly appService: AppService) { }
 
   @Post()
+  @ApiOperation({ summary: '默认接口' })
+  @ApiResponse({
+    status: 200,
+    description: '正常情况下回响应"成功",表示服务正常',
+  })
   get(@Body() body) {
     console.log(body, 'body1');
     return this.appService.get();
